@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    build: ./posgres
+    networks:
+      - odoo_postgres_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: my_db
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U odoo -d my_db -h localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  odoo:
+    build: ./odoo
+    volumes:
+      - odoo_data:/path/to/odoo/data
+    networks:
+      - odoo_postgres_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8069:8069"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: odoo
+      DB_NAME: my_db
+      DB_PASSWORD: odoo
+
+networks:
+  odoo_postgres_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  odoo_data:

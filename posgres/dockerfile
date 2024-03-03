@@ -1,0 +1,18 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y sudo
+
+RUN apt-get update && \
+    apt-get install -y postgresql-14 postgresql-contrib && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /the/workdir/path
+COPY . /the/workdir/path/.
+
+RUN chmod +x /the/workdir/path/init.sh
+
+EXPOSE 5432
+
+ENTRYPOINT ["/the/workdir/path/init.sh"]

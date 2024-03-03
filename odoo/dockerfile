@@ -1,0 +1,37 @@
+FROM ubuntu:22.04
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    git \
+    python3 \
+    python3-pip \
+    libpq-dev \
+    libldap2-dev \
+    libsasl2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装 PostgreSQL 客户端
+RUN apt-get update && apt-get install -y postgresql-client
+
+# 添加非特权用户 odoo
+RUN useradd -ms /bin/bash odoo
+
+# 克隆Odoo存储库
+RUN git clone --depth=1 https://github.com/odoo/odoo.git /odoo
+
+# 设置工作目录
+WORKDIR /odoo
+
+# 安装Odoo所需的Python依赖项
+RUN pip3 install -r requirements.txt
+
+# 复制初始化脚本到容器内
+COPY odoo_init.sh /odoo/odoo_init.sh
+COPY odoo.conf /odoo/odoo.conf
+RUN chmod +x /odoo/odoo_init.sh
+
+# 切换为非特权用户 odoo
+USER odoo
+
+# 启动Odoo服务
+CMD ["/odoo/odoo_init.sh"]
