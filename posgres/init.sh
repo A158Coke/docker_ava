@@ -14,8 +14,6 @@ sudo -u postgres psql -c "ALTER USER odoo WITH SUPERUSER;"
 sudo -u postgres psql -c "ALTER DATABASE my_db OWNER TO odoo;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE my_db TO odoo;"
 
-# 在数据库中创建表
-sudo -u postgres psql -d my_db -c "ALTER TABLE ir_module_module ADD COLUMN name VARCHAR(255), ADD COLUMN state VARCHAR(255);"
 
 
 # 重新加载 PostgreSQL 配置
